@@ -40,8 +40,6 @@ int main() {
             return 0;
         }
     }
-
-
     for (i = 0; i < opCount; i++) {
         if (ops[i] == '*' || ops[i] == '/') {
             if (ops[i] == '*') {
@@ -61,13 +59,12 @@ int main() {
         }
     }
 
-
     int result = nums[0];
     for (i = 0; i < opCount; i++) {
         if (ops[i] == '+') result += nums[i+1];
         else if (ops[i] == '-') result -= nums[i+1];
     }
-
     printf("%d\n", result);
     return 0;
 }
+
