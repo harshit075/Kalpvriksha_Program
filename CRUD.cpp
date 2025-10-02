@@ -10,7 +10,6 @@ struct User {
     int age;
 };
 
-
 void initFile() {
     FILE *file = fopen(FILENAME, "a");
     if (file == NULL) {
@@ -179,5 +178,6 @@ int main() {
         }
     }
 }
+
 
 
