@@ -10,7 +10,7 @@ struct User {
     int age;
 };
 
-// Initialize file
+
 void initFile() {
     FILE *file = fopen(FILENAME, "a");
     if (file == NULL) {
@@ -20,7 +20,7 @@ void initFile() {
     fclose(file);
 }
 
-// Create user
+
 void createUser() {
     FILE *file = fopen(FILENAME, "a");
     if (!file) {
@@ -32,11 +32,11 @@ void createUser() {
 
     printf("Enter Id: ");
     scanf("%d", &user.id);
-    getchar(); // clear newline
+    getchar(); 
 
     printf("Enter Name: ");
     fgets(user.name, sizeof(user.name), stdin);
-    user.name[strcspn(user.name, "\n")] = 0; // remove newline
+    user.name[strcspn(user.name, "\n")] = 0; 
 
     printf("Enter Age: ");
     scanf("%d", &user.age);
@@ -47,7 +47,7 @@ void createUser() {
     printf("User added successfully!\n");
 }
 
-// Read all users
+
 void readUsers() {
     FILE *file = fopen(FILENAME, "r");
     if (!file) {
@@ -71,7 +71,7 @@ void readUsers() {
     fclose(file);
 }
 
-// Update user
+
 void updateUser() {
     FILE *file = fopen(FILENAME, "r");
     FILE *temp = fopen("temp.txt", "w");
@@ -84,7 +84,7 @@ void updateUser() {
     int id;
     printf("Enter User ID to update: ");
     scanf("%d", &id);
-    getchar(); // clear newline
+    getchar(); 
 
     struct User user;
     int found = 0;
@@ -116,7 +116,7 @@ void updateUser() {
         printf("User not found!\n");
 }
 
-// Delete user
+
 void deleteUser() {
     FILE *file = fopen(FILENAME, "r");
     FILE *temp = fopen("temp.txt", "w");
@@ -154,7 +154,6 @@ void deleteUser() {
         printf("User not found!\n");
 }
 
-// Main menu
 int main() {
     initFile();
     int choice;
@@ -168,7 +167,7 @@ int main() {
         printf("5. Exit\n");
         printf("Enter choice: ");
         scanf("%d", &choice);
-        getchar(); // clear newline
+        getchar();
 
         switch (choice) {
             case 1: createUser(); break;
@@ -180,4 +179,5 @@ int main() {
         }
     }
 }
+
 
