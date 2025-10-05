@@ -6,33 +6,35 @@
 #define MAX 100
 
 int main() {
-    char expr[MAX];
+    char expression[MAX];
     printf("Enter expression: ");
-    fgets(expr, MAX, stdin);
+    fgets(expression, MAX, stdin);
 
-    int nums[MAX];      
-    char ops[MAX];      
-    int numCount = 0, opCount = 0;
+    int operands[MAX];
+    char operators[MAX];
+    int operandCount = 0, operatorCount = 0;
 
-    int i = 0;
-    while (expr[i]) {
-        if (isspace(expr[i])) {
-            i++;
+    int exprIndex = 0;
+    while (expression[exprIndex]) {
+        if (isspace(expression[exprIndex])) {
+            exprIndex++;
             continue;
         }
-        if (isdigit(expr[i])) {
-            int val = 0;
-            while (isdigit(expr[i])) {
-                val = val * 10 + (expr[i] - '0');
-                i++;
+
+        if (isdigit(expression[exprIndex])) {
+            int value = 0;
+            while (isdigit(expression[exprIndex])) {
+                value = value * 10 + (expression[exprIndex] - '0');
+                exprIndex++;
             }
-            nums[numCount++] = val;
+            operands[operandCount++] = value;
         }
-        else if (expr[i] == '+' || expr[i] == '-' || expr[i] == '*' || expr[i] == '/') {
-            ops[opCount++] = expr[i];
-            i++;
+        else if (expression[exprIndex] == '+' || expression[exprIndex] == '-' ||
+                 expression[exprIndex] == '*' || expression[exprIndex] == '/') {
+            operators[operatorCount++] = expression[exprIndex];
+            exprIndex++;
         }
-        else if (expr[i] == '\n') {
+        else if (expression[exprIndex] == '\n') {
             break; 
         }
         else {
@@ -40,31 +42,41 @@ int main() {
             return 0;
         }
     }
-    for (i = 0; i < opCount; i++) {
-        if (ops[i] == '*' || ops[i] == '/') {
-            if (ops[i] == '*') {
-                nums[i] = nums[i] * nums[i+1];
+
+  
+    for (int opIndex = 0; opIndex < operatorCount; opIndex++) {
+        if (operators[opIndex] == '*' || operators[opIndex] == '/') {
+            if (operators[opIndex] == '*') {
+                operands[opIndex] = operands[opIndex] * operands[opIndex + 1];
             } else {
-                if (nums[i+1] == 0) {
+                if (operands[opIndex + 1] == 0) {
                     printf("Error: Division by zero.\n");
                     return 0;
                 }
-                nums[i] = nums[i] / nums[i+1];
+                operands[opIndex] = operands[opIndex] / operands[opIndex + 1];
             }
-            for (int j = i+1; j < numCount-1; j++) nums[j] = nums[j+1];
-            for (int j = i; j < opCount-1; j++) ops[j] = ops[j+1];
-            numCount--;
-            opCount--;
-            i--; 
+
+            
+            for (int shiftIndex = opIndex + 1; shiftIndex < operandCount - 1; shiftIndex++)
+                operands[shiftIndex] = operands[shiftIndex + 1];
+            for (int shiftIndex = opIndex; shiftIndex < operatorCount - 1; shiftIndex++)
+                operators[shiftIndex] = operators[shiftIndex + 1];
+
+            operandCount--;
+            operatorCount--;
+            opIndex--;
         }
     }
 
-    int result = nums[0];
-    for (i = 0; i < opCount; i++) {
-        if (ops[i] == '+') result += nums[i+1];
-        else if (ops[i] == '-') result -= nums[i+1];
+   
+    int result = operands[0];
+    for (int opIndex = 0; opIndex < operatorCount; opIndex++) {
+        if (operators[opIndex] == '+') 
+            result += operands[opIndex + 1];
+        else if (operators[opIndex] == '-') 
+            result -= operands[opIndex + 1];
     }
-    printf("%d\n", result);
+
+    printf("Result: %d\n", result);
     return 0;
 }
-
