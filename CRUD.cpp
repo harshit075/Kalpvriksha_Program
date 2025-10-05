@@ -19,7 +19,6 @@ void initFile() {
     fclose(file);
 }
 
-
 void createUser() {
     FILE *file = fopen(FILENAME, "a");
     if (!file) {
@@ -46,7 +45,6 @@ void createUser() {
     printf("User added successfully!\n");
 }
 
-
 void readUsers() {
     FILE *file = fopen(FILENAME, "r");
     if (!file) {
@@ -70,12 +68,11 @@ void readUsers() {
     fclose(file);
 }
 
-
 void updateUser() {
     FILE *file = fopen(FILENAME, "r");
-    FILE *temp = fopen("temp.txt", "w");
+    FILE *backupFile = fopen("backup_users.txt", "w");
 
-    if (!file || !temp) {
+    if (!file || !backupFile) {
         printf("Error opening file!\n");
         return;
     }
@@ -100,14 +97,14 @@ void updateUser() {
 
             found = 1;
         }
-        fprintf(temp, "%d|%s|%d\n", user.id, user.name, user.age);
+        fprintf(backupFile, "%d|%s|%d\n", user.id, user.name, user.age);
     }
 
     fclose(file);
-    fclose(temp);
+    fclose(backupFile);
 
     remove(FILENAME);
-    rename("temp.txt", FILENAME);
+    rename("backup_users.txt", FILENAME);
 
     if (found)
         printf("User updated successfully!\n");
@@ -115,12 +112,11 @@ void updateUser() {
         printf("User not found!\n");
 }
 
-
 void deleteUser() {
     FILE *file = fopen(FILENAME, "r");
-    FILE *temp = fopen("temp.txt", "w");
+    FILE *backupFile = fopen("backup_users.txt", "w");
 
-    if (!file || !temp) {
+    if (!file || !backupFile) {
         printf("Error opening file!\n");
         return;
     }
@@ -138,14 +134,14 @@ void deleteUser() {
             found = 1;
             continue;
         }
-        fprintf(temp, "%d|%s|%d\n", user.id, user.name, user.age);
+        fprintf(backupFile, "%d|%s|%d\n", user.id, user.name, user.age);
     }
 
     fclose(file);
-    fclose(temp);
+    fclose(backupFile);
 
     remove(FILENAME);
-    rename("temp.txt", FILENAME);
+    rename("backup_users.txt", FILENAME);
 
     if (found)
         printf("User deleted successfully!\n");
@@ -178,6 +174,3 @@ int main() {
         }
     }
 }
-
-
-
