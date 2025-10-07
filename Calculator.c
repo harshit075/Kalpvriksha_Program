@@ -43,38 +43,38 @@ int main() {
         }
     }
 
-  
-    for (int opIndex = 0; opIndex < operatorCount; opIndex++) {
-        if (operators[opIndex] == '*' || operators[opIndex] == '/') {
-            if (operators[opIndex] == '*') {
-                operands[opIndex] = operands[opIndex] * operands[opIndex + 1];
+    
+    for (int operatorIndex = 0; operatorIndex < operatorCount; operatorIndex++) {
+        if (operators[operatorIndex] == '*' || operators[operatorIndex] == '/') {
+            if (operators[operatorIndex] == '*') {
+                operands[operatorIndex] = operands[operatorIndex] * operands[operatorIndex + 1];
             } else {
-                if (operands[opIndex + 1] == 0) {
+                if (operands[operatorIndex + 1] == 0) {
                     printf("Error: Division by zero.\n");
                     return 0;
                 }
-                operands[opIndex] = operands[opIndex] / operands[opIndex + 1];
+                operands[operatorIndex] = operands[operatorIndex] / operands[operatorIndex + 1];
             }
 
             
-            for (int shiftIndex = opIndex + 1; shiftIndex < operandCount - 1; shiftIndex++)
+            for (int shiftIndex = operatorIndex + 1; shiftIndex < operandCount - 1; shiftIndex++)
                 operands[shiftIndex] = operands[shiftIndex + 1];
-            for (int shiftIndex = opIndex; shiftIndex < operatorCount - 1; shiftIndex++)
+            for (int shiftIndex = operatorIndex; shiftIndex < operatorCount - 1; shiftIndex++)
                 operators[shiftIndex] = operators[shiftIndex + 1];
 
             operandCount--;
             operatorCount--;
-            opIndex--;
+            operatorIndex--; 
         }
     }
 
    
     int result = operands[0];
-    for (int opIndex = 0; opIndex < operatorCount; opIndex++) {
-        if (operators[opIndex] == '+') 
-            result += operands[opIndex + 1];
-        else if (operators[opIndex] == '-') 
-            result -= operands[opIndex + 1];
+    for (int operatorIndex = 0; operatorIndex < operatorCount; operatorIndex++) {
+        if (operators[operatorIndex] == '+') 
+            result += operands[operatorIndex + 1];
+        else if (operators[operatorIndex] == '-') 
+            result -= operands[operatorIndex + 1];
     }
 
     printf("Result: %d\n", result);
