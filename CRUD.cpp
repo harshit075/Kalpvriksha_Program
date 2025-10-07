@@ -72,8 +72,13 @@ void updateUser() {
     FILE *file = fopen(FILENAME, "r");
     FILE *backupFile = fopen("backup_users.txt", "w");
 
-    if (!file || !backupFile) {
-        printf("Error opening file!\n");
+     if (!file || !backupFile) {
+        if (!file)
+            perror("Error opening users file for update");
+        if (!backupFile)
+            perror("Error opening backup file for update");
+        if (file) fclose(file);
+        if (backupFile) fclose(backupFile);
         return;
     }
 
@@ -117,7 +122,12 @@ void deleteUser() {
     FILE *backupFile = fopen("backup_users.txt", "w");
 
     if (!file || !backupFile) {
-        printf("Error opening file!\n");
+        if (!file)
+            perror("Error opening users file for delete");
+        if (!backupFile)
+            perror("Error opening backup file for delete");
+        if (file) fclose(file);
+        if (backupFile) fclose(backupFile);
         return;
     }
 
@@ -174,3 +184,4 @@ int main() {
         }
     }
 }
+
