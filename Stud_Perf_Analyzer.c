@@ -18,8 +18,8 @@ void studentRollNo(struct Student students[], int index, int studentCount);
 
 float total_Marks(float marks[]) {
     float total = 0;
-    for (int i = 0; i < 3; i++) {
-        total += marks[i];
+    for (int index = 0; index < 3; index++) {
+        total += marks[index];
     }
     return total;
 }
@@ -130,4 +130,5 @@ int main() {
 
     return 0;
 }
+
 
