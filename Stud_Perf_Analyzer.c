@@ -53,7 +53,7 @@ void student_Performance(char grade) {
 
 void studentRollNo(struct Student students[], int index, int studentCount) {
     if (index == studentCount)
-        return;
+    return;
     printf("%d ", students[index].roll_no);
     studentRollNo(students, index + 1, studentCount);
 }
@@ -102,12 +102,10 @@ int main() {
             return 1;
         }
     }
-
     students[studentIndex].total = total_Marks(students[studentIndex].marks);
     students[studentIndex].average = _Average(students[studentIndex].total);
     students[studentIndex].grade = _Grade(students[studentIndex].average);
 }
-
 
     printf("Student Performance Analysis\n");
 
@@ -132,3 +130,4 @@ int main() {
 
     return 0;
 }
+
