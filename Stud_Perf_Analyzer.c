@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#define NUM_SUBJECTS 3
 struct Student {
     int roll_no;
     char name[50];
@@ -10,13 +11,13 @@ struct Student {
     char grade;
 };
 
-float total_Marks(float marks[]);
-float _Average(float total);
-char _Grade(float average);
+float total_marks(float marks[]);
+float caluculate_average(float total);
+char grades(float average);
 void student_Performance(char grade);
-void studentRollNo(struct Student students[], int index, int studentCount);
+void student_roll_no(struct Student students[], int index, int studentCount);
 
-float total_Marks(float marks[]) {
+float total_marks(float marks[]) {
     float total = 0;
     for (int index = 0; index < 3; index++) {
         total += marks[index];
@@ -24,11 +25,11 @@ float total_Marks(float marks[]) {
     return total;
 }
 
-float _Average(float total) {
-    return total / 3;
+float caluculate_average(float total) {
+    return total / NUM_SUBJECTS;
 }
 
-char _Grade(float avg) {
+char grades(float avg) {
     if (avg >= 85) return 'A';
     else if (avg >= 70) return 'B';
     else if (avg >= 50) return 'C';
@@ -51,16 +52,15 @@ void student_Performance(char grade) {
     printf("\n");
 }
 
-void studentRollNo(struct Student students[], int index, int studentCount) {
+void student_roll_no(struct Student students[], int index, int studentCount) {
     if (index == studentCount)
     return;
     printf("%d ", students[index].roll_no);
-    studentRollNo(students, index + 1, studentCount);
+    student_roll_no(students, index + 1, studentCount);
 }
 
 int main() {
     int studentCount;
-    printf("Enter the Number of Students: ");
     scanf("%d", &studentCount);
 
     if (studentCount < 1 || studentCount > 100) {
@@ -102,9 +102,9 @@ int main() {
             return 1;
         }
     }
-    students[studentIndex].total = total_Marks(students[studentIndex].marks);
-    students[studentIndex].average = _Average(students[studentIndex].total);
-    students[studentIndex].grade = _Grade(students[studentIndex].average);
+    students[studentIndex].total = total_marks(students[studentIndex].marks);
+    students[studentIndex].average = caluculate_average(students[studentIndex].total);
+    students[studentIndex].grade = grades(students[studentIndex].average);
 }
 
     printf("Student Performance Analysis\n");
@@ -125,11 +125,8 @@ int main() {
     }
 
     printf("\nList of Roll Numbers: ");
-    studentRollNo(students, 0, studentCount);
+    student_roll_no(students, 0, studentCount);
     printf("\n");
 
     return 0;
 }
-
-
-
