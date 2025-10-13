@@ -45,7 +45,7 @@ void student_Performance(char grade) {
         case 'D': stars = 2; break;
         default: stars = 0; break;
     }
-    for (int i = 0; i < stars; i++) {
+    for (int index = 0; index < stars; index++) {
         printf("* ");
     }
     printf("\n");
@@ -130,5 +130,6 @@ int main() {
 
     return 0;
 }
+
 
 
