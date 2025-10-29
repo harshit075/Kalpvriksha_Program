@@ -13,13 +13,13 @@ int main() {
 
     int arr[size];
     printf("Enter %d elements: ", size);
-    for (int i = 0; i < size; i++)
+    for (int index = 0; index < size; index++)
         scanf("%d", &arr[i]);
 
     int smallest = INT_MAX, secondSmallest = INT_MAX;
     int largest = INT_MIN, secondLargest = INT_MIN;
 
-    for (int i = 0; i < size; i++) {
+    for (int index = 0; index < size; index++) {
         int num = arr[i];
 
        
@@ -46,3 +46,4 @@ int main() {
 
     return 0;
 }
+
