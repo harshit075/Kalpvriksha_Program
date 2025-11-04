@@ -11,7 +11,6 @@ typedef struct {
     int quantity;
 } Product;
 
-
 Product* initializeInventory(int totalProducts);
 int addProduct(Product **inventory, int *totalProducts);
 void viewProducts(Product *inventory, int totalProducts);
@@ -21,6 +20,7 @@ void searchByName(Product *inventory, int totalProducts);
 void searchByPriceRange(Product *inventory, int totalProducts);
 int deleteProduct(Product **inventory, int *totalProducts);
 void freeInventory(Product *inventory, int totalProducts);
+
 
 
 Product* initializeInventory(int totalProducts) {
@@ -38,9 +38,10 @@ Product* initializeInventory(int totalProducts) {
     return ptr;
 }
 
+
+
 int addProduct(Product **inventory, int *totalProducts) {
     int newCount = *totalProducts + 1;
-
     Product *temp = realloc(*inventory, newCount * sizeof(Product));
     if (temp == NULL) {
         printf("Memory reallocation failed! Product not added.\n");
@@ -48,28 +49,30 @@ int addProduct(Product **inventory, int *totalProducts) {
     }
 
     *inventory = temp;
-    Product *newProd = &((*inventory)[newCount - 1]);
+    int newProductIndex = newCount - 1;
 
-    newProd->name = malloc(NAME_SIZE);
-    if (newProd->name == NULL) {
+    (*inventory)[newProductIndex].name = malloc(NAME_SIZE);
+    if ((*inventory)[newProductIndex].name == NULL) {
         printf("Memory allocation for name failed!\n");
         return 0;
     }
 
     printf("\nEnter new product details:\n");
     printf("Product ID: ");
-    scanf("%d", &newProd->id);
+    scanf("%d", &((*inventory)[newProductIndex].id));
     printf("Product Name: ");
-    scanf("%49s", newProd->name);
+    scanf("%49s", (*inventory)[newProductIndex].name);
     printf("Product Price: ");
-    scanf("%f", &newProd->price);
+    scanf("%f", &((*inventory)[newProductIndex].price));
     printf("Product Quantity: ");
-    scanf("%d", &newProd->quantity);
+    scanf("%d", &((*inventory)[newProductIndex].quantity));
 
     *totalProducts = newCount;
-    printf(" Product added successfully!\n");
+    printf("Product added successfully!\n");
     return 1;
 }
+
+
 
 void viewProducts(Product *inventory, int totalProducts) {
     if (totalProducts == 0) {
@@ -84,24 +87,30 @@ void viewProducts(Product *inventory, int totalProducts) {
     }
 }
 
+
+
 void updateQuantity(Product *inventory, int totalProducts) {
-    int id, qty, found = 0;
+    int id, newQuantity, found = 0;
     printf("Enter Product ID to update: ");
     scanf("%d", &id);
 
     for (int i = 0; i < totalProducts; i++) {
         if (inventory[i].id == id) {
             printf("Enter new quantity: ");
-            scanf("%d", &qty);
-            inventory[i].quantity = qty;
+            scanf("%d", &newQuantity);
+            inventory[i].quantity = newQuantity;
             printf("Quantity updated successfully!\n");
             found = 1;
             break;
         }
     }
 
-    if (!found) printf("Product not found!\n");
+    if (!found) {
+        printf("Product not found!\n");
+    }
 }
+
+
 
 void searchByID(Product *inventory, int totalProducts) {
     int id, found = 0;
@@ -117,8 +126,12 @@ void searchByID(Product *inventory, int totalProducts) {
         }
     }
 
-    if (!found) printf("Product not found!\n");
+    if (!found) {
+        printf("Product not found!\n");
+    }
 }
+
+
 
 void searchByName(Product *inventory, int totalProducts) {
     char query[NAME_SIZE];
@@ -135,49 +148,57 @@ void searchByName(Product *inventory, int totalProducts) {
         }
     }
 
-    if (!found) printf("No products matched.\n");
+    if (!found) {
+        printf("No products matched.\n");
+    }
 }
 
+
+
 void searchByPriceRange(Product *inventory, int totalProducts) {
-    float minP, maxP;
+    float minPrice, maxPrice;
     int found = 0;
 
     printf("Enter minimum price: ");
-    scanf("%f", &minP);
+    scanf("%f", &minPrice);
     printf("Enter maximum price: ");
-    scanf("%f", &maxP);
+    scanf("%f", &maxPrice);
 
     for (int i = 0; i < totalProducts; i++) {
-        if (inventory[i].price >= minP && inventory[i].price <= maxP) {
+        if (inventory[i].price >= minPrice && inventory[i].price <= maxPrice) {
             printf("ID: %d | Name: %s | Price: %.2f | Quantity: %d\n",
                    inventory[i].id, inventory[i].name, inventory[i].price, inventory[i].quantity);
             found = 1;
         }
     }
 
-    if (!found) printf("No products found in range.\n");
+    if (!found) {
+        printf("No products found in the specified range.\n");
+    }
 }
 
+
+
 int deleteProduct(Product **inventory, int *totalProducts) {
-    int id, idx = -1;
+    int id, productIndex = -1;
     printf("Enter Product ID to delete: ");
     scanf("%d", &id);
 
     for (int i = 0; i < *totalProducts; i++) {
         if ((*inventory)[i].id == id) {
-            idx = i;
+            productIndex = i;
             break;
         }
     }
 
-    if (idx == -1) {
+    if (productIndex == -1) {
         printf("Product not found!\n");
         return 0;
     }
 
-    free((*inventory)[idx].name);
+    free((*inventory)[productIndex].name);
 
-    for (int i = idx; i < *totalProducts - 1; i++) {
+    for (int i = productIndex; i < *totalProducts - 1; i++) {
         (*inventory)[i] = (*inventory)[i + 1];
     }
 
@@ -199,6 +220,8 @@ int deleteProduct(Product **inventory, int *totalProducts) {
     return 1;
 }
 
+
+
 void freeInventory(Product *inventory, int totalProducts) {
     for (int i = 0; i < totalProducts; i++) {
         free(inventory[i].name);
@@ -219,17 +242,18 @@ int main() {
     }
 
     inventory = initializeInventory(totalProducts);
+
     for (int i = 0; i < totalProducts; i++) {
         inventory[i].name = malloc(NAME_SIZE);
         printf("\nEnter details for product %d:\n", i + 1);
         printf("Product ID: ");
-        scanf("%d", &inventory[i].id);
+        scanf("%d", &(inventory[i].id));
         printf("Product Name: ");
         scanf("%49s", inventory[i].name);
         printf("Product Price: ");
-        scanf("%f", &inventory[i].price);
+        scanf("%f", &(inventory[i].price));
         printf("Product Quantity: ");
-        scanf("%d", &inventory[i].quantity);
+        scanf("%d", &(inventory[i].quantity));
     }
 
     while (1) {
