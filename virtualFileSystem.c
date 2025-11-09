@@ -23,7 +23,7 @@ typedef struct FileNode {
     NodeType type;
     struct FileNode *next;
     struct FileNode *prev;
-    struct FileNode *child; // circular linked list for child entries
+    struct FileNode *child; 
     struct FileNode *parent;
     int blockPointers[MAX_BLOCKS_PER_FILE];
     int blockCount;
