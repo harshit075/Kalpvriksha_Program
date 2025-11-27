@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 #include "Players_data.h"
 
 
@@ -29,8 +28,21 @@ typedef struct {
 } Team;
 
 
+
 Team teamsList[10];
 int totalTeams = 10;
+
+
+int isPlayerIdExists(int id) {
+    for (int index = 0; index < totalTeams; index++) {
+        PlayerNode* temp = teamsList[index].playerList;
+        while (temp) {
+            if (temp->playerId == id) return 1;
+            temp = temp->next;
+        }
+    }
+    return 0;
+}
 
 
 float computePerformanceIndex(PlayerNode* p) {
@@ -46,7 +58,13 @@ float computePerformanceIndex(PlayerNode* p) {
 
 
 PlayerNode* createPlayer(const Player data) {
-    PlayerNode* p = (PlayerNode*)malloc(sizeof(PlayerNode));
+    PlayerNode* p = malloc(sizeof(PlayerNode));
+
+    if (!p) {
+        printf("Memory allocation failed! Player skipped.\n");
+        return NULL;
+    }
+
     p->playerId = data.id;
     strcpy(p->name, data.name);
     strcpy(p->teamName, data.team);
@@ -58,9 +76,9 @@ PlayerNode* createPlayer(const Player data) {
     p->economyRate = data.economyRate;
     p->performanceIndex = computePerformanceIndex(p);
     p->next = NULL;
+
     return p;
 }
-
 
 void insertPlayer(Team* team, PlayerNode* newPlayer) {
     newPlayer->next = team->playerList;
@@ -72,6 +90,7 @@ void insertPlayer(Team* team, PlayerNode* newPlayer) {
 void updateTeamStrikeRate(Team* team) {
     float totalSR = 0;
     int count = 0;
+
     PlayerNode* temp = team->playerList;
     while (temp) {
         if (strcmp(temp->role, "Batsman") == 0 || strcmp(temp->role, "All-rounder") == 0) {
@@ -80,6 +99,7 @@ void updateTeamStrikeRate(Team* team) {
         }
         temp = temp->next;
     }
+
     team->avgBattingStrikeRate = (count > 0) ? totalSR / count : 0;
 }
 
@@ -87,17 +107,20 @@ void updateTeamStrikeRate(Team* team) {
 void initializeTeamsAndPlayers() {
     for (int index = 0; index < totalTeams; index++) {
         teamsList[index].teamId = index + 1;
-        strcpy(teamsList[index].teamName, teams[index]);
+        strcpy(teamsList[i].teamName, teams[index]);
         teamsList[index].totalPlayers = 0;
         teamsList[index].avgBattingStrikeRate = 0;
         teamsList[index].playerList = NULL;
     }
 
     for (int index = 0; index < playerCount; index++) {
+        if (isPlayerIdExists(players[index].id)) continue; 
         PlayerNode* p = createPlayer(players[index]);
-        for (int j = 0; j < totalTeams; j++) {
-            if (strcmp(players[index].team, teamsList[j].teamName) == 0) {
-                insertPlayer(&teamsList[j], p);
+        if (!p) continue;
+
+        for (int t = 0; t < totalTeams; t++) {
+            if (strcmp(players[i].team, teamsList[t].teamName) == 0) {
+                insertPlayer(&teamsList[t], p);
                 break;
             }
         }
@@ -121,36 +144,52 @@ Team* searchTeamById(int id) {
 }
 
 
-
-
 void addPlayer() {
     int teamId;
-    printf("Enter Team ID to add player (1-10): ");
+    printf("Enter Team ID (1-10): ");
     scanf("%d", &teamId);
     getchar();
 
     Team* team = searchTeamById(teamId);
     if (!team) {
-        printf("Invalid Team ID.\n");
+        printf("Invalid team!\n");
         return;
     }
 
-    PlayerNode* p = (PlayerNode*)malloc(sizeof(PlayerNode));
+    PlayerNode* p = malloc(sizeof(PlayerNode));
+    if (!p) {
+        printf("Memory allocation failed!\n");
+        return;
+    }
 
-    printf("Enter Player ID: "); scanf("%d", &p->playerId);
+    printf("Enter Player ID: ");
+    scanf("%d", &p->playerId);
     getchar();
-    printf("Enter Player Name: "); fgets(p->name, 50, stdin);
+
+    if (isPlayerIdExists(p->playerId)) {
+        printf("Player ID already exists!\n");
+        free(p);
+        return;
+    }
+
+    printf("Enter Player Name: ");
+    fgets(p->name, 50, stdin);
     p->name[strcspn(p->name, "\n")] = 0;
+
     strcpy(p->teamName, team->teamName);
 
-    int roleChoice;
+    int choice;
     printf("Role (1-Batsman, 2-Bowler, 3-All-rounder): ");
-    scanf("%d", &roleChoice);
-    switch (roleChoice) {
+    scanf("%d", &choice);
+
+    switch (choice) {
         case 1: strcpy(p->role, "Batsman"); break;
         case 2: strcpy(p->role, "Bowler"); break;
         case 3: strcpy(p->role, "All-rounder"); break;
-        default: printf("Invalid Role.\n"); free(p); return;
+        default:
+            printf("Invalid role.\n");
+            free(p);
+            return;
     }
 
     printf("Total Runs: "); scanf("%d", &p->totalRuns);
@@ -164,56 +203,42 @@ void addPlayer() {
 
     insertPlayer(team, p);
     updateTeamStrikeRate(team);
-    printf("Player added successfully to Team %s!\n", team->teamName);
+
+    printf("Player added successfully!\n");
 }
 
 
 void displayPlayersOfTeam() {
-    int teamId;
+    int id;
     printf("Enter Team ID: ");
-    scanf("%d", &teamId);
+    scanf("%d", &id);
 
-    Team* team = searchTeamById(teamId);
-    if (!team) { printf("Invalid Team ID.\n"); return; }
+    Team* team = searchTeamById(id);
+    if (!team) { printf("Invalid team.\n"); return; }
 
     printf("\nPlayers of Team %s:\n", team->teamName);
-    printf("======================================================================================================================\n");
-    printf("ID\tName\t\tRole\t\tRuns\tAvg\tSR\tWkts\tER\tPerf.Index\n");
-    printf("======================================================================================================================\n");
+    printf("====================================================================================\n");
+    printf("ID\tName\t\tRole\tRuns\tAvg\tSR\tWkts\tER\tPerfIndex\n");
+    printf("====================================================================================\n");
 
-    PlayerNode* temp = team->playerList;
-    while (temp) {
-        printf("%d\t%-15s\t%-12s\t%d\t%.1f\t%.1f\t%d\t%.1f\t%.2f\n",
-               temp->playerId, temp->name, temp->role, temp->totalRuns,
-               temp->battingAverage, temp->strikeRate, temp->wickets,
-               temp->economyRate, temp->performanceIndex);
-        temp = temp->next;
+    PlayerNode* t = team->playerList;
+    while (t) {
+        printf("%d\t%-12s\t%-12s\t%d\t%.1f\t%.1f\t%d\t%.1f\t%.2f\n",
+               t->playerId, t->name, t->role, t->totalRuns, t->battingAverage,
+               t->strikeRate, t->wickets, t->economyRate, t->performanceIndex);
+        t = t->next;
     }
-    printf("======================================================================================================================\n");
-    printf("Total Players: %d\nAverage Batting Strike Rate: %.2f\n", team->totalPlayers, team->avgBattingStrikeRate);
+
+    printf("====================================================================================\n");
+    printf("Total Players: %d\nAvg Batting SR: %.2f\n", team->totalPlayers, team->avgBattingStrikeRate);
 }
 
 
 int compareTeams(const void* a, const void* b) {
-    Team* t1 = (Team*)a;
-    Team* t2 = (Team*)b;
-    return (t2->avgBattingStrikeRate > t1->avgBattingStrikeRate) - (t2->avgBattingStrikeRate < t1->avgBattingStrikeRate);
+    Team* x = (Team*)a;
+    Team* y = (Team*)b;
+    return (y->avgBattingStrikeRate > x->avgBattingStrikeRate) - (y->avgBattingStrikeRate < x->avgBattingStrikeRate);
 }
-
-
-void displayTeamsByStrikeRate() {
-    qsort(teamsList, totalTeams, sizeof(Team), compareTeams);
-    printf("\nTeams Sorted by Average Batting Strike Rate:\n");
-    printf("==============================================================\n");
-    printf("ID\tTeam Name\t\tAvg Bat SR\tTotal Players\n");
-    printf("==============================================================\n");
-    for (int index = 0; index < totalTeams; index++) {
-        printf("%d\t%-15s\t%.2f\t\t%d\n", teamsList[index].teamId, teamsList[index].teamName,
-               teamsList[index].avgBattingStrikeRate, teamsList[index].totalPlayers);
-    }
-    printf("==============================================================\n");
-}
-
 
 int comparePlayers(const void* a, const void* b) {
     PlayerNode* p1 = *(PlayerNode**)a;
@@ -221,88 +246,115 @@ int comparePlayers(const void* a, const void* b) {
     return (p2->performanceIndex > p1->performanceIndex) - (p2->performanceIndex < p1->performanceIndex);
 }
 
+// Display teams sorted
+void displayTeamsByStrikeRate() {
+    qsort(teamsList, totalTeams, sizeof(Team), compareTeams);
+
+    printf("\nTeams Sorted by Strike Rate:\n");
+    printf("======================================================\n");
+    printf("ID\tTeam\t\tAvg SR\tPlayers\n");
+    printf("======================================================\n");
+
+    for (int index = 0; index < totalTeams; index++) {
+        printf("%d\t%-15s\t%.2f\t%d\n",
+               teamsList[index].teamId,
+               teamsList[index].teamName,
+               teamsList[index].avgBattingStrikeRate,
+               teamsList[index].totalPlayers);
+    }
+}
+
 
 void displayTopKPlayers() {
-    int teamId, roleChoice, num_player;
-    printf("Enter Team ID: "); scanf("%d", &teamId);
-    printf("Enter Role (1-Batsman, 2-Bowler, 3-All-rounder): "); scanf("%d", &roleChoice);
-    printf("Enter number of players (K): "); scanf("%d", &num_player);
+    int teamId, roleChoice, k;
+
+    printf("Enter Team ID: ");
+    scanf("%d", &teamId);
+    printf("Role (1-Batsman, 2-Bowler, 3-All-rounder): ");
+    scanf("%d", &roleChoice);
+    printf("Enter K: ");
+    scanf("%d", &k);
 
     Team* team = searchTeamById(teamId);
-    if (!team) { printf("Invalid Team ID.\n"); return; }
+    if (!team) { printf("Invalid team.\n"); return; }
 
     char role[20];
-    switch (roleChoice) {
-        case 1: strcpy(role, "Batsman"); break;
-        case 2: strcpy(role, "Bowler"); break;
-        case 3: strcpy(role, "All-rounder"); break;
-        default: printf("Invalid Role.\n"); return;
-    }
+    if (roleChoice == 1) strcpy(role, "Batsman");
+    else if (roleChoice == 2) strcpy(role, "Bowler");
+    else if (roleChoice == 3) strcpy(role, "All-rounder");
+    else { printf("Invalid role.\n"); return; }
 
-    PlayerNode* temp = team->playerList;
-    PlayerNode* arr[100];
+    PlayerNode* arr[200];
     int count = 0;
 
-    while (temp) {
-        if (strcmp(temp->role, role) == 0) arr[count++] = temp;
-        temp = temp->next;
+    PlayerNode* t = team->playerList;
+    while (t) {
+        if (strcmp(t->role, role) == 0)
+            arr[count++] = t;
+        t = t->next;
     }
 
     qsort(arr, count, sizeof(PlayerNode*), comparePlayers);
 
-    if (num_player > count) num_player = count;
-    printf("\nTop %d %ss of Team %s:\n", num_player, role, team->teamName);
-    printf("=====================================================================================================================\n");
-    printf("ID\tName\t\tRole\tRuns\tAvg\tSR\tWkts\tER\tPerf.Index\n");
-    printf("=====================================================================================================================\n");
-    for (int index = 0; index < num_player; index++) {
-        printf("%d\t%-15s\t%-12s\t%d\t%.1f\t%.1f\t%d\t%.1f\t%.2f\n",
-               arr[index]->playerId, arr[index]->name, arr[index]->role, arr[index]->totalRuns,
-               arr[index]->battingAverage, arr[index]->strikeRate, arr[index]->wickets,
-               arr[index]->economyRate, arr[index]->performanceIndex);
+    if (k > count) k = count;
+
+    printf("\nTop %d %s of %s:\n", k, role, team->teamName);
+    printf("===============================================================\n");
+    for (int i = 0; i < k; i++) {
+        printf("%d\t%-12s\t%.2f\n", arr[i]->playerId, arr[i]->name, arr[i]->performanceIndex);
     }
-    printf("=====================================================================================================================\n");
 }
 
 
 void displayAllPlayersByRole() {
     int roleChoice;
-    printf("Enter Role (1-Batsman, 2-Bowler, 3-All-rounder): ");
+    printf("Role (1-Batsman, 2-Bowler, 3-All-rounder): ");
     scanf("%d", &roleChoice);
 
     char role[20];
-    switch (roleChoice) {
-        case 1: strcpy(role, "Batsman"); break;
-        case 2: strcpy(role, "Bowler"); break;
-        case 3: strcpy(role, "All-rounder"); break;
-        default: printf("Invalid Role.\n"); return;
-    }
+    if (roleChoice == 1) strcpy(role, "Batsman");
+    else if (roleChoice == 2) strcpy(role, "Bowler");
+    else if (roleChoice == 3) strcpy(role, "All-rounder");
+    else { printf("Invalid role.\n"); return; }
 
-    PlayerNode* arr[300];
+    PlayerNode* arr[500];
     int count = 0;
 
     for (int index = 0; index < totalTeams; index++) {
-        PlayerNode* temp = teamsList[index].playerList;
-        while (temp) {
-            if (strcmp(temp->role, role) == 0) arr[count++] = temp;
-            temp = temp->next;
+        PlayerNode* t = teamsList[index].playerList;
+        while (t) {
+            if (strcmp(t->role, role) == 0)
+                arr[count++] = t;
+            t = t->next;
         }
     }
 
     qsort(arr, count, sizeof(PlayerNode*), comparePlayers);
 
-    printf("\nAll %ss Across All Teams:\n", role);
-    printf("=====================================================================================================================\n");
-    printf("ID\tName\t\tTeam\t\tRole\tRuns\tAvg\tSR\tWkts\tER\tPerf.Index\n");
-    printf("=====================================================================================================================\n");
+    printf("\nAll %s Players Across Teams:\n", role);
+    printf("===============================================================\n");
+
     for (int index = 0; index < count; index++) {
-        printf("%d\t%-15s\t%-12s\t%-12s\t%d\t%.1f\t%.1f\t%d\t%.1f\t%.2f\n",
-               arr[index]->playerId, arr[index]->name, arr[index]->teamName, arr[index]->role,
-               arr[index]->totalRuns, arr[index]->battingAverage, arr[index]->strikeRate,
-               arr[index]->wickets, arr[index]->economyRate, arr[index]->performanceIndex);
+        printf("%d\t%-12s\t%-12s\t%.2f\n",
+               arr[index]->playerId, arr[index]->name, arr[index]->teamName, arr[index]->performanceIndex);
     }
-    printf("=====================================================================================================================\n");
 }
+
+void freeTeamPlayers(Team* t) {
+    PlayerNode* curr = t->playerList;
+    while (curr) {
+        PlayerNode* next = curr->next;
+        free(curr);
+        curr = next;
+    }
+}
+
+void freeAllTeams() {
+    for (int index = 0; index < totalTeams; index++) {
+        freeTeamPlayers(&teamsList[index]);
+    }
+}
+
 
 
 int main() {
@@ -310,17 +362,17 @@ int main() {
 
     int choice;
     do {
-        printf("\n==============================================================================\n");
-        printf("ICC ODI Player Performance Analyzer\n");
-        printf("==============================================================================\n");
-        printf("1. Add Player to Team\n");
-        printf("2. Display Players of a Specific Team\n");
-        printf("3. Display Teams by Average Batting Strike Rate\n");
-        printf("4. Display Top K Players of a Specific Team by Role\n");
-        printf("5. Display all Players of specific Role Across All Teams\n");
+        printf("\n=============================================\n");
+        printf(" ICC ODI Player Performance Analyzer\n");
+        printf("=============================================\n");
+        printf("1. Add Player\n");
+        printf("2. Display Players of a Team\n");
+        printf("3. Display Teams by Strike Rate\n");
+        printf("4. Display Top K Players by Role\n");
+        printf("5. Display All Players by Role\n");
         printf("6. Exit\n");
-        printf("==============================================================================\n");
-        printf("Enter your choice: ");
+        printf("=============================================\n");
+        printf("Enter choice: ");
         scanf("%d", &choice);
 
         switch (choice) {
@@ -329,9 +381,14 @@ int main() {
             case 3: displayTeamsByStrikeRate(); break;
             case 4: displayTopKPlayers(); break;
             case 5: displayAllPlayersByRole(); break;
-            case 6: printf("Exiting...\n"); break;
-            default: printf("Invalid choice! Try again.\n");
+            case 6: 
+                printf("Cleaning memory and exiting...\n");
+                freeAllTeams();
+                break;
+            default:
+                printf("Invalid choice!\n");
         }
+
     } while (choice != 6);
 
     return 0;
